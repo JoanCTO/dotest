@@ -1,34 +1,50 @@
 import * as React from "react";
-import { RESULTS } from "../mocks";
+import { ICard } from "../types";
+import { OBJECTS_API } from "../urls";
 import Card from "./card";
 
 interface ICardsProps {
-  list: any | any[];
+  list: number[];
 }
 
-const fetchCardData = (list: any) => {
-  // TODO FETCH CARDS DATA
-  return RESULTS;
+const fetchCardData = async (list: number[]): Promise<ICard[]> => {
+  const promises = list.map((id) => fetch(`${OBJECTS_API}${id}`));
+  const allResponses = await Promise.all(promises);
+  const successfullResponses = await Promise.all(
+    allResponses.reduce((acc, res) => {
+      if (res.ok) {
+        acc.push(res.json());
+      }
+      return acc;
+    }, [] as Promise<ICard>[])
+  );
+  return successfullResponses;
 };
 
 const Cards: React.FunctionComponent<ICardsProps> = ({ list }) => {
-  const [cardResults, setCardResults] = React.useState<any>(RESULTS);
+  const [cardResults, setCardResults] = React.useState<ICard[]>([]);
 
   React.useEffect(() => {
-    setCardResults(fetchCardData(list));
-  }, []);
+    const fetchAndSet = async () => {
+      const cardData = await fetchCardData(list);
+      setCardResults(cardData);
+    };
+    fetchAndSet();
+  }, [list]);
 
-  if (list) {
-    return (
-      <div className="cardsContainer">
-        {cardResults.map((card: any) => {
-          return <Card data={card} />;
-        })}
-      </div>
-    );
-  } else {
+  if (!list.length) {
     return <div>No list</div>;
   }
+
+  return (
+    <>
+      <div className="cardsContainer">
+        {cardResults.map((card) => {
+          return <Card data={card} key={card.objectID} />;
+        })}
+      </div>
+    </>
+  );
 };
 
 export default Cards;

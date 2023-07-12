@@ -1,34 +1,59 @@
 import * as React from "react";
+import { ICard } from "../types";
 
 interface ICardProps {
-  data: any;
+  data: ICard;
 }
 
-// CHECK MISSING CARD DATA
+const isSmallScreen = window.innerWidth < 1024;
+
 const Card: React.FunctionComponent<ICardProps> = ({ data }) => {
   const {
     primaryImage,
     primaryImageSmall,
+    artistDisplayName,
+    artistNationality,
+    dimensions,
+    medium,
+    tags,
     title,
-    artistDisplayBio,
-    accessionNumber,
+    objectURL,
   } = data;
 
   return (
     <div className="card">
-      <h3>{title}</h3>
-      {primaryImage || primaryImageSmall ? (
-        <img
-          className="cardImage"
-          src={primaryImage || primaryImageSmall}
-          alt={`${title}-picture`}
-        />
-      ) : null}
-      {(!!primaryImage || !!primaryImageSmall) === false ? (
-        <div className="imageFallback" />
-      ) : null}
-      <p className="bio">{artistDisplayBio}</p>
-      <p className="bio">{accessionNumber}</p>
+      <a href={objectURL}>
+        <div className="cardImageContainer">
+          {primaryImage || primaryImageSmall ? (
+            <img
+              className="cardImage"
+              src={primaryImage || primaryImageSmall}
+              alt={`${title}`}
+            />
+          ) : (
+            <div className="imageFallback" />
+          )}
+        </div>
+        <div className="cardInfo">
+          <div className="cardPrimaryInfo">
+            <p>{artistDisplayName || "Unidentified artist"}</p>
+            <p>{artistNationality}</p>
+          </div>
+          {!isSmallScreen && (
+            <div className="cardSecondaryInfo">
+              <p>{medium}</p>
+              <p>{dimensions}</p>
+            </div>
+          )}
+        </div>
+        {tags && (
+          <div className="cardTags">
+            {tags.map((tag, i) => {
+              return <p key={i}>{tag.term}</p>;
+            })}
+          </div>
+        )}
+      </a>
     </div>
   );
 };
