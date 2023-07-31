@@ -6,8 +6,12 @@ interface ICardsProps {
   list: any | any[];
 }
 
-const fetchCardData = (list: any) => {
-  // TODO FETCH CARDS DATA
+const API = "https://collectionapi.metmuseum.org/public/collection/v1/";
+
+// 2. TODO fetch each artwork data from the API
+//    NOTE: 'list' argument is src/mocks.ts LIST.objectIDs
+const fetchCardData = (list: number[]) => {
+  // TODO fetch each artwork data with it's ID
   return RESULTS;
 };
 
