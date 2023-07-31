@@ -6,10 +6,13 @@ import { LIST } from "./mocks";
 
 const API = "https://collectionapi.metmuseum.org/public/collection/v1/";
 
-// TODO fetch query list and add some types
+// 1. TODO fetch query list and add some types
 function fetchSearchQuery(e: any, setter: any) {
-  let response = fetch(API + "search?q=" + e.target.value);
-  setter(response);
+  const searchInputValue = e.target.value;
+  const API_SEARCH_URL = API + "search?q=" + searchInputValue;
+
+  // fetch here the museum API, remove mock data
+  setter(LIST.objectIDs);
 }
 
 function App() {
