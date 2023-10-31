@@ -1,28 +1,26 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from 'react';
 import "./App.css";
-import Search from "./search";
+import Search from "./components/search";
 import Cards from "./components/cards";
-import { LIST } from "./mocks";
+import { fetchSearchQuery } from './services/getchSearchQuery';
+import { LoadingContext, TypeLoadingProvider } from './context/LoadingProvider';
 
-const API = "https://collectionapi.metmuseum.org/public/collection/v1/";
 
 // 1. TODO fetch query list and add some types
-function fetchSearchQuery(e: any, setter: any) {
-  const searchInputValue = e.target.value;
-  const API_SEARCH_URL = API + "search?q=" + searchInputValue;
-
-  // fetch here the museum API, remove mock data
-  setter(LIST.objectIDs);
-}
-
 function App() {
-  const [listOfCards, setCards] = useState<any>(LIST.objectIDs);
-  return (
-    <div className="App">
-      <Search searchAction={(e: any) => fetchSearchQuery(e, setCards)} />
-      <Cards list={listOfCards} />
-    </div>
-  );
+    const [objectIds, setObjectIds] = useState<number[]>([]);
+    const { loading, setLoading } = useContext(LoadingContext) as TypeLoadingProvider;
+
+
+    if (loading) {
+        return <h2>Loading...</h2>
+    }
+    return (
+        <div className="App">
+                <Search searchAction={(query: string) => fetchSearchQuery(query, setObjectIds, setLoading)} />
+                {loading ? <h2>Loading...</h2> : <Cards objectIds={objectIds && objectIds.slice(0, 50)} />}
+        </div>
+    );
 }
 
 export default App;

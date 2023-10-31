@@ -1,7 +1,8 @@
 import * as React from "react";
+import { IMetMuseum } from "../models/models";
 
 interface ICardProps {
-  data: any;
+  data: IMetMuseum;
 }
 
 // CHECK MISSING CARD DATA
@@ -12,7 +13,7 @@ const Card: React.FunctionComponent<ICardProps> = ({ data }) => {
     title,
     artistDisplayBio,
     accessionNumber,
-  } = data;
+  } = data as IMetMuseum;
 
   return (
     <div className="card">
@@ -24,7 +25,7 @@ const Card: React.FunctionComponent<ICardProps> = ({ data }) => {
           alt={`${title}-picture`}
         />
       ) : null}
-      {(!!primaryImage || !!primaryImageSmall) === false ? (
+      {!(!!primaryImage || !!primaryImageSmall) ? (
         <div className="imageFallback" />
       ) : null}
       <p className="bio">{artistDisplayBio}</p>

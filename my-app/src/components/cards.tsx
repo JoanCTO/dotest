@@ -1,37 +1,57 @@
 import * as React from "react";
-import { RESULTS } from "../mocks";
-import Card from "./card";
+import Pagination from "./pagination";
+import PagePosts from "./pagePosts";
+import { IMetMuseum } from "../models/models";
+import { getData } from '../services/getData';
+import { useContext } from 'react';
+import { LoadingContext, TypeLoadingProvider } from '../context/LoadingProvider';
 
 interface ICardsProps {
-  list: any | any[];
+  objectIds: number[];
 }
 
-const API = "https://collectionapi.metmuseum.org/public/collection/v1/";
 
 // 2. TODO fetch each artwork data from the API
 //    NOTE: 'list' argument is src/mocks.ts LIST.objectIDs
-const fetchCardData = (list: number[]) => {
-  // TODO fetch each artwork data with it's ID
-  return RESULTS;
-};
+const Cards: React.FunctionComponent<ICardsProps> = ({ objectIds }) => {
+  const [cardResults, setCardResults] = React.useState<IMetMuseum[]>([]);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [postsPerPage, setPostsPerPage] = React.useState(6);
+  const { loading, setLoading } = useContext(LoadingContext) as TypeLoadingProvider;
 
-const Cards: React.FunctionComponent<ICardsProps> = ({ list }) => {
-  const [cardResults, setCardResults] = React.useState<any>(RESULTS);
 
-  React.useEffect(() => {
-    setCardResults(fetchCardData(list));
-  }, []);
+    const indexOfLastPost = currentPage * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    const currentPosts = cardResults.slice(indexOfFirstPost, indexOfLastPost);
 
-  if (list) {
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+    React.useEffect(() => {
+      let newFetch = false;
+
+      if (!newFetch && (objectIds && objectIds.length > 0)) {
+          getData(objectIds, setCardResults);
+      }
+
+      return () => {
+          newFetch = true;
+      };
+  }, [objectIds]);
+
+  if (objectIds) {
     return (
-      <div className="cardsContainer">
-        {cardResults.map((card: any) => {
-          return <Card data={card} />;
-        })}
-      </div>
+        <>
+            <PagePosts items={currentPosts}/>
+            <Pagination
+                currentPage={currentPage}
+                postsPerPage={postsPerPage}
+                totalPosts={cardResults.length}
+                paginate={paginate}
+            />
+        </>
     );
   } else {
-    return <div>No list</div>;
+    return <div>No resutls found.</div>;
   }
 };
 
